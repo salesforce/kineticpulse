@@ -1,0 +1,61 @@
+
+val scala212Version = "2.12.15"
+val scala213Version = "2.13.8"
+val prometheusVersion = "0.16.+"
+
+val scalaTestArtifact    = "org.scalatest"     %% "scalatest"           % "3.2.+"    % Test
+val prometheusClient     = "io.prometheus"     % "simpleclient"         % prometheusVersion
+val prometheusCommon     = "io.prometheus"     % "simpleclient_common"  % prometheusVersion
+val prometheusHotSpot    = "io.prometheus"     % "simpleclient_hotspot" % prometheusVersion
+val logbackArtifact      = "ch.qos.logback"    % "logback-classic"      % "1.2.6"
+
+lazy val commonSettings = Seq(
+  scalaVersion := scala212Version,
+  scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
+    // scala 2.13.3 introduced this new lint rule, but it does not work too well with things
+    // that depend on shapeless (e.g., circe) https://github.com/scala/bug/issues/12072.
+    // Disabling it for now.
+    case Some((2, 13)) => Seq("-Xlint:-byname-implicit,_", "-deprecation", "-feature", "-Xlint", "-Xfatal-warnings")
+    case _ => Seq("-deprecation", "-feature", "-Xlint", "-Xfatal-warnings")
+  }),
+  crossScalaVersions := Seq(
+    scala212Version,
+    scala213Version
+  ),
+  libraryDependencies += scalaTestArtifact,
+  organization := "com.salesforce.mce",
+  headerLicense := Some(HeaderLicense.Custom(
+    """|Copyright (c) 2022, salesforce.com, inc.
+       |All rights reserved.
+       |SPDX-License-Identifier: BSD-3-Clause
+       |For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+       |""".stripMargin
+  )),
+  assembly / test := {}  // skip test during assembly
+)
+lazy val root = (project in file(".")).
+  settings(commonSettings: _*).
+  settings(
+    name := "kineticpulse",
+    libraryDependencies ++= Seq(
+    )
+  ).
+  aggregate(metric)
+
+
+lazy val metric = (project in file("kineticpulse-metric")).
+  enablePlugins(BuildInfoPlugin).
+  settings(commonSettings: _*).
+  settings(
+    name := "kineticpulse-metric",
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoPackage := "com.salesforce.mce.kineticpulse",
+    fork := true,
+    libraryDependencies ++= Seq(
+      guice,
+      prometheusClient,
+      prometheusCommon,
+      prometheusHotSpot,
+      logbackArtifact
+    )
+  )
