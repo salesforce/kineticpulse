@@ -1,5 +1,7 @@
 # kineticpulse
 
+[![CircleCI](https://circleci.com/gh/salesforce/kineticpulse.svg?style=svg)](https://circleci.com/gh/salesforce/kineticpulse)
+
 Collecting metrics on a Scala Play service client for monitoring.  This library 
 covers the metrics collection via Prometheus client types such as Counter, Summary. 
 A metrics server can scrape the collected metrics via a specified HTTP endpoint.  

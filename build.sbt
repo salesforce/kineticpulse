@@ -9,6 +9,36 @@ val prometheusCommon     = "io.prometheus"     % "simpleclient_common"  % promet
 val prometheusHotSpot    = "io.prometheus"     % "simpleclient_hotspot" % prometheusVersion
 val logbackArtifact      = "ch.qos.logback"    % "logback-classic"      % "1.2.6"
 
+lazy val publishSettings = Seq(
+  publishMavenStyle := true,
+  pomIncludeRepository := { _ => false },
+  publishTo := sonatypePublishToBundle.value,
+  licenses := Seq("Apache-2.0" -> url("http://opensource.org/licenses/Apache-2.0")),
+  homepage := Some(url("https://github.com/salesforce/kineticpulse")),
+  scmInfo := Some(
+    ScmInfo(
+      url("https://github.com/salesforce/kineticpulse"),
+      "scm:git:git@github.com:salesforce/kineticpulse.git"
+    )
+  ),
+  credentials += Credentials(
+    "Sonatype Nexus Repository Manager",
+    "oss.sonatype.org",
+    sys.env.getOrElse("SONATYPE_USERNAME",""),
+    sys.env.getOrElse("SONATYPE_PASSWORD","")
+  ),
+  developers := List(
+    Developer(
+      id = "schowsf",
+      name = "Simon Chow",
+      email = "simon.chow@salesforce.com",
+      url = url("https://github.com/schowsf")
+    )
+  ),
+  useGpgPinentry := true
+)
+
+
 lazy val commonSettings = Seq(
   scalaVersion := scala212Version,
   scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
@@ -46,6 +76,7 @@ lazy val root = (project in file(".")).
 lazy val metric = (project in file("kineticpulse-metric")).
   enablePlugins(BuildInfoPlugin).
   settings(commonSettings: _*).
+  settings(publishSettings: _*).
   settings(
     name := "kineticpulse-metric",
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
