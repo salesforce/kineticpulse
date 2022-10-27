@@ -77,6 +77,7 @@ lazy val root = (project in file(".")).
 lazy val metric = (project in file("kineticpulse-metric")).
   enablePlugins(BuildInfoPlugin).
   settings(commonSettings: _*).
+  settings(publishSettings: _*).
   settings(
     name := "kineticpulse-metric",
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
