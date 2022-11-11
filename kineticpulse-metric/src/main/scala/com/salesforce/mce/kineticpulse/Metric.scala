@@ -140,7 +140,7 @@ trait Metric {
 
   def collect: Future[String]
 
-  def clear(): Unit
+  def onCollect(): Unit
 
 }
 
@@ -219,7 +219,7 @@ class PrometheusMetric @Inject() (implicit ec: ExecutionContext) extends Metric 
     writer.toString
   }
 
-  override def clear(): Unit = {}
+  override def onCollect(): Unit = {}
 
 }
 
