@@ -29,9 +29,12 @@ trait Metric {
 
   lazy val config = new Configuration(ConfigFactory.load())
 
-  val endpoint: Option[String] = config.getOptional[String](s"$baseName.metrics.endpoint")
+  val isMetricDisabled: Boolean =
+    !config.getOptional[Boolean](s"$baseName.metrics.enabled").getOrElse(false)
 
-  val isMetricDisabled: Boolean = endpoint.getOrElse("").isEmpty
+  if (isMetricDisabled) {
+    logger.warn(s"kineticpulse parse requests for metrics collection is disabled.")
+  }
 
   val bypassPaths: Set[String] =
     config.getOptional[Seq[String]](s"$baseName.metrics.bypass.paths") match {
