@@ -29,9 +29,9 @@ class MetricFilter @Inject() (
   )(requestHeader: RequestHeader): Future[Result] = {
     metric.parseRequest(requestHeader) match {
       case Nil => nextFilter(requestHeader)
-      case ms: Seq[(String, String, String)] =>
+      case ms: Seq[Metric.Label] =>
         val httpTimer = PrometheusMetric.httpDurationPercentiles.startTimer()
-        val stopTimers = ms.flatMap { x => metric.timeRequest(x._1, x._2, x._3) }
+        val stopTimers = ms.flatMap { l => metric.timeRequest(l.method, l.path, l.argument) }
         nextFilter(requestHeader)
           .transform(
             result => {
@@ -41,7 +41,7 @@ class MetricFilter @Inject() (
               PrometheusMetric.httpStatusCount
                 .labels(result.header.status.toString, requestHeader.method)
                 .inc()
-              ms.foreach { x => metric.countRequest(x._1, x._2, x._3, Option(result)) }
+              ms.foreach { l => metric.countRequest(l.method, l.path, l.argument, Option(result)) }
               metric.gaugeRequest(requestHeader, Option(result))
               result
             },
@@ -51,7 +51,7 @@ class MetricFilter @Inject() (
               stopTimers.foreach(_.apply())
               // none result -> Internal Server Error 500 status
               PrometheusMetric.httpStatusCount.labels("500", requestHeader.method).inc()
-              ms.foreach { x => metric.countRequest(x._1, x._2, x._3, None) }
+              ms.foreach { l => metric.countRequest(l.method, l.path, l.argument, None) }
               metric.gaugeRequest(requestHeader, None)
               exception
             }

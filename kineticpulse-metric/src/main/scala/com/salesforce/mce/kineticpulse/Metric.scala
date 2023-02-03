@@ -21,6 +21,8 @@ import org.slf4j.{Logger, LoggerFactory}
 import play.api.Configuration
 import play.api.mvc.{RequestHeader, Result}
 
+import com.salesforce.mce.kineticpulse.Metric.Label
+
 trait Metric {
 
   protected val logger: Logger = LoggerFactory.getLogger(getClass)
@@ -56,9 +58,9 @@ trait Metric {
   /**
    * parse request to identify labels for metrics
    * @param request  http request
-   * @return Seq of Tuples of (method, path, argument)
+   * @return Seq of kineticpulse.Metric.Label
    */
-  def parseRequest(request: RequestHeader): Seq[(String, String, String)] = {
+  def parseRequest(request: RequestHeader): Seq[Label] = {
     parseSubSegments(request, getPathLadder)
   }
 
@@ -98,7 +100,7 @@ trait Metric {
   private def parseSubSegments(
     request: RequestHeader,
     permutePathFunc: String => Seq[String]
-  ): Seq[(String, String, String)] = {
+  ): Seq[Label] = {
     if (isMetricDisabled || isBypassPath(request.path)) {
       logger.debug(s"Metric parseRequest returning None for ${request.path}")
       Nil
@@ -125,10 +127,10 @@ trait Metric {
         // The cardinality of the labels increases the number of time series in the metric,
         // thus affecting the memory and compute resources for maintaining the Summary.
         // This default trait function leaves argument as an empty String.
-        (request.method, p, "")
+        Label(request.method, p)
       }
       if (matches.isEmpty)
-        Seq((request.method, unmatchedPathValue, "")) // single element seq to collect metric
+        Seq(Label(request.method, unmatchedPathValue)) // single element seq to collect metric
       else matches
     }
   }
@@ -154,6 +156,14 @@ trait Metric {
 
 }
 
+object Metric {
+  case class Label(
+    method: String,
+    path: String,
+    argument: String = ""
+  )
+}
+
 @Singleton
 class PrometheusMetric @Inject() (implicit ec: ExecutionContext) extends Metric {
 
@@ -164,8 +174,8 @@ class PrometheusMetric @Inject() (implicit ec: ExecutionContext) extends Metric 
     resultOpt: Option[Result]
   ): Seq[() => Unit] = {
     parseRequest(requestHeader) match {
-      case ms: Seq[(String, String, String)] =>
-        ms.flatMap { x => timeRequest(x._1, x._2, x._3) }
+      case ms: Seq[Label] =>
+        ms.flatMap(l => timeRequest(l.method, l.path, l.argument))
       case _ => // either metric is not enabled, or the request path is bypassed
         logger.debug(s"timeRequest Nil")
         Nil
@@ -185,7 +195,7 @@ class PrometheusMetric @Inject() (implicit ec: ExecutionContext) extends Metric 
 
   override def countRequest(requestHeader: RequestHeader, resultOpt: Option[Result]): Unit = {
     parseRequest(requestHeader) match {
-      case ms: Seq[(String, String, String)] =>
+      case ms: Seq[Label] =>
         PrometheusMetric.httpStatusCount
           .labels(
             // none result -> Internal Server Error 500 status
@@ -193,7 +203,7 @@ class PrometheusMetric @Inject() (implicit ec: ExecutionContext) extends Metric 
             requestHeader.method
           )
           .inc()
-        ms.foreach { x => countRequest(x._1, x._2, x._3, resultOpt) }
+        ms.foreach { l => countRequest(l.method, l.path, l.argument, resultOpt) }
       case _ =>
     }
   }
