@@ -1,13 +1,12 @@
-
-val scala212Version = "2.12.15"
-val scala213Version = "2.13.8"
+val scala212Version = "2.12.17"
+val scala213Version = "2.13.10"
 val prometheusVersion = "0.16.+"
 
 val scalaTestArtifact    = "org.scalatest"     %% "scalatest"           % "3.2.+"    % Test
 val prometheusClient     = "io.prometheus"     % "simpleclient"         % prometheusVersion
 val prometheusCommon     = "io.prometheus"     % "simpleclient_common"  % prometheusVersion
 val prometheusHotSpot    = "io.prometheus"     % "simpleclient_hotspot" % prometheusVersion
-val logbackArtifact      = "ch.qos.logback"    % "logback-classic"      % "1.2.+"
+val logbackArtifact      = "ch.qos.logback"    % "logback-classic"      % "1.3.+"
 
 lazy val publishSettings = Seq(
   publishMavenStyle := true,
@@ -60,8 +59,7 @@ lazy val commonSettings = Seq(
        |SPDX-License-Identifier: BSD-3-Clause
        |For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
        |""".stripMargin
-  )),
-  assembly / test := {}  // skip test during assembly
+  ))
 )
 lazy val root = (project in file(".")).
   settings(commonSettings: _*).
