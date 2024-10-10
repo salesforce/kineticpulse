@@ -1,5 +1,5 @@
 val scala212Version = "2.12.17"
-val scala213Version = "2.13.10"
+val scala213Version = "2.13.14"
 val prometheusVersion = "0.16.+"
 
 val scalaTestArtifact    = "org.scalatest"     %% "scalatest"           % "3.2.+"    % Test
@@ -39,7 +39,7 @@ lazy val publishSettings = Seq(
 
 
 lazy val commonSettings = Seq(
-  scalaVersion := scala212Version,
+  scalaVersion := scala213Version,
   scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
     // scala 2.13.3 introduced this new lint rule, but it does not work too well with things
     // that depend on shapeless (e.g., circe) https://github.com/scala/bug/issues/12072.
