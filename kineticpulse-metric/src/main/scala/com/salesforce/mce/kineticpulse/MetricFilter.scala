@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import akka.stream.Materializer
+import org.apache.pekko.stream.Materializer
 import org.slf4j.LoggerFactory
 import play.api.mvc.{Filter, RequestHeader, Result}
 
