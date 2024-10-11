@@ -1,5 +1,4 @@
-val scala212Version = "2.12.17"
-val scala213Version = "2.13.14"
+val scala213Version = "2.13.15"
 val prometheusVersion = "0.16.+"
 
 val scalaTestArtifact    = "org.scalatest"     %% "scalatest"           % "3.2.+"    % Test
@@ -47,10 +46,6 @@ lazy val commonSettings = Seq(
     case Some((2, 13)) => Seq("-Xlint:-byname-implicit,_", "-deprecation", "-feature", "-Xlint", "-Xfatal-warnings")
     case _ => Seq("-deprecation", "-feature", "-Xlint", "-Xfatal-warnings")
   }),
-  crossScalaVersions := Seq(
-    scala212Version,
-    scala213Version
-  ),
   libraryDependencies += scalaTestArtifact,
   organization := "com.salesforce.mce",
   headerLicense := Some(HeaderLicense.Custom(
