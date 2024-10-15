@@ -1,4 +1,5 @@
 val scala213Version = "2.13.15"
+val scala333Version = "3.3.3"
 val prometheusVersion = "0.16.+"
 
 val scalaTestArtifact    = "org.scalatest"     %% "scalatest"           % "3.2.+"    % Test
@@ -44,8 +45,13 @@ lazy val commonSettings = Seq(
     // that depend on shapeless (e.g., circe) https://github.com/scala/bug/issues/12072.
     // Disabling it for now.
     case Some((2, 13)) => Seq("-Xlint:-byname-implicit,_", "-deprecation", "-feature", "-Xlint", "-Xfatal-warnings")
+    case Some((3, 3)) => Seq()
     case _ => Seq("-deprecation", "-feature", "-Xlint", "-Xfatal-warnings")
   }),
+  crossScalaVersions := Seq(
+    scala213Version,
+    scala333Version
+  ),
   libraryDependencies += scalaTestArtifact,
   organization := "com.salesforce.mce",
   headerLicense := Some(HeaderLicense.Custom(
