@@ -21,7 +21,7 @@ class MetricController @Inject() (
   ec: ExecutionContext
 ) extends AbstractController(cc) {
 
-  def collect: Action[AnyContent] = Action.async { _: Request[AnyContent] =>
+  def collect: Action[AnyContent] = Action.async { (_: Request[AnyContent]) =>
     val metricResults = metric.collect.map(output => Ok(output))
     metricResults.onComplete(_ => metric.onCollect())
     metricResults
