@@ -6,7 +6,7 @@ val scalaTestArtifact    = "org.scalatest"     %% "scalatest"           % "3.2.+
 val prometheusClient     = "io.prometheus"     % "simpleclient"         % prometheusVersion
 val prometheusCommon     = "io.prometheus"     % "simpleclient_common"  % prometheusVersion
 val prometheusHotSpot    = "io.prometheus"     % "simpleclient_hotspot" % prometheusVersion
-val logbackArtifact      = "ch.qos.logback"    % "logback-classic"      % "1.5.17"
+val logbackArtifact      = "ch.qos.logback"    % "logback-classic"      % "1.5.19"
 
 lazy val publishSettings = Seq(
   publishMavenStyle := true,
