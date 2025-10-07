@@ -1,3 +1,5 @@
+import xerial.sbt.Sonatype.sonatypeCentralHost
+
 val scala213Version = "2.13.15"
 val scala333Version = "3.3.3"
 val prometheusVersion = "0.16.+"
@@ -34,7 +36,8 @@ lazy val publishSettings = Seq(
       url = url("https://github.com/schowsf")
     )
   ),
-  useGpgPinentry := true
+  useGpgPinentry := true,
+  ThisBuild / sonatypeCredentialHost := sonatypeCentralHost
 )
 
 
